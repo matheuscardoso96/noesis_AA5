@@ -376,7 +376,7 @@ def DoModBindsV7(mod):
    for mesh in mod.meshes:
        rapi.rpgSetMaterial(hex(mod.GetMeshMaterialNameHashV7(mesh)))
        rapi.rpgSetBoneMap(mod.boneMaps[mesh.BoneGroupIndex])
-       rapi.rpgSetName("mesh" + str(mesh.meshIndex) + "_" + str(mesh.boneIndices[0]))
+       rapi.rpgSetName(str(counter) + "_mesh_" + str(mesh.boneIndices[0]))
        rapi.rpgBindPositionBufferOfs(mesh.vertices, noesis.RPGEODATA_SHORT, 6,0)
        rapi.rpgBindNormalBuffer(mesh.normals, noesis.RPGEODATA_FLOAT, 16,0)
        rapi.rpgBindUV1Buffer(mesh.uvs, noesis.RPGEODATA_FLOAT, 8,0)
@@ -395,7 +395,7 @@ def DoModBindsV230(mod):
    #for mesh in mod.meshes:
        rapi.rpgSetMaterial(hex(mod.GetMeshMaterialNameHash(mod.meshes[counter])))
        rapi.rpgSetBoneMap(mod.boneMaps[mod.meshes[counter].BoneGroupIndex])
-       rapi.rpgSetName("mesh" + str(mod.meshes[counter].meshIndex) + "_" + str(mod.meshes[counter].boneIndices[0]))
+       rapi.rpgSetName(str(counter) + "_mesh_" + str(mod.meshes[counter].boneIndices[0]))
        if(mod.meshes[counter].VertexBufferFormat == 0xD6784014):
            BindMeshVertexIAObj2w(mod.meshes[counter])
        elif(mod.meshes[counter].VertexBufferFormat == 0x1B36016):
