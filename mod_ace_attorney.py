@@ -1375,7 +1375,7 @@ class MaterialDesc3DS:
             if(self.blockType == 3):
                self.textureId = bs.readInt()- 1
                self.shaderHashName = bs.readUInt()
-               if(self.shaderHashName == 0xCD06F187):
+               if(self.shaderHashName == 0xCD06F187 or self.shaderHashName == 0xCD06F190):
                   if(self.textureId < 0): continue
                   hasFindTexture = 1
                   finalOffset = textureDataOffset + self.textureId * 0x4C + 0xC
