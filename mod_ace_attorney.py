@@ -13,7 +13,7 @@ import rapi
 #registerNoesisTypes is called by Noesis to allow the script to register formats.
 #Do not implement this function in script files unless you want them to be dedicated format modules!
 def registerNoesisTypes():
-   handle = noesis.register("Dual Destinies", ".mod")
+   handle = noesis.register("ace attorney model", ".mod")
    noesis.setHandlerTypeCheck(handle, noepyCheckType)
    noesis.setHandlerLoadModel(handle, noepyLoadModel) #see also noepyLoadModelRPG
    noesis.setHandlerWriteModel(handle, noepyWriteModel)
@@ -961,13 +961,7 @@ class ModModelV230:
             v = 1.0 - bs.readFloat()
             UVBuffer.extend(bytearray(struct.pack("f", u)))
             UVBuffer.extend(bytearray(struct.pack("f", v)))
-            boneInd0 = bs.readByte()
-            boneInd1 = bs.readByte()
-            
-            boneIndR0 = self.boneMaps[mesh.BoneGroupIndex][boneInd0]
-            boneIndR1 = self.boneMaps[mesh.BoneGroupIndex][boneInd1]
-            boneIndexBuffer.extend(bytearray(struct.pack("b", boneInd0)))
-            boneIndexBuffer.extend(bytearray(struct.pack("b", boneInd1)))
+            boneIndexBuffer.extend(bytearray(bs.readBytes(2)))
             bw1 = bs.readByte() *0.00392156862
             bw2 = bs.readByte() *0.00392156862
             boneWeightBuffer.extend(bytearray(struct.pack("f", bw1)))
@@ -1004,7 +998,8 @@ class ModModelV230:
             bw1 = bs.readByte() *0.00392156862#27
             bw2 = bs.readByte() *0.00392156862#28
             bs.seek(4, NOESEEK_REL)#32
-            boneIndexBuffer.extend(bs.readBytes(2))#33
+            boneIndexBuffer.extend(bs.readBytes(1))#33
+            boneIndexBuffer.extend(bs.readBytes(1))#34
             bw3 = bs.readByte() *0.00392156862#35
             bw4 = bs.readByte() *0.00392156862#36
             normalBuffer.extend(bytearray(struct.pack("f", nx)))
@@ -1016,6 +1011,8 @@ class ModModelV230:
             boneWeightBuffer.extend(bytearray(struct.pack("f", bw2)))
             boneWeightBuffer.extend(bytearray(struct.pack("f", bw3)))
             boneWeightBuffer.extend(bytearray(struct.pack("f", bw4)))
+            
+            
            
 
         mesh.vertices = bytearray(vertexBuffer)
