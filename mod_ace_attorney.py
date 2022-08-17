@@ -515,13 +515,14 @@ class ModModelV7:
             #localT[3] = bone.position
             bone.localT = localTBytes
             #noebones.append(NoeBone(bone.index, "bone_" + str(bone.index), localT, None, bone.parentIndex))
-           
+        
+        bnIndx = 0
         for bone in bones:
             worldTBytes = bs.readBytes(0x40)
             worldT = NoeMat44.fromBytes(worldTBytes).toMat43().inverse()
             bone.worldT = worldTBytes
-            #worldT[3] = bone.position
-            noebones.append(NoeBone(bone.index,"bone_" + str(bone.index), worldT, None, bone.parentIndex))
+            noebones.append(NoeBone(bnIndx,"bone_" + str(bnIndx), worldT, "bone_" + str(bone.parentIndex), bone.parentIndex))
+            bnIndx+=1
 
         self.bones = bones 
         self.noeBones = noebones
@@ -905,42 +906,17 @@ class ModModelV230:
         for bone in bones:
             bone.ReadWorldTrasform(bs)
         
-        #for bone in bones:
-            #bone
-            #worldT = NoeMat44.fromBytes(bone.localTBytes).toMat43().inverse()
-            #worldT = NoeMat44.fromBytes(bone.localTBytes).toMat43().inverse()
-            #noebones.append(NoeBone(bone.index,"bone_" + str(bone.index), worldT, None, bone.parentIndex))
-            
+        bnIndx = 0        
         for bone in bones:
             hasSet = False
             hasParent = True
             trans = None
             pIndex = 0
             boneP = None
-            while (hasParent):
-                  if(hasSet == False):
-                     trans = bone.localTransform.toMat43().inverse()
-                     hasSet = True
-                     pIndex =  bone.parentIndex
-                    
-                  else:
-                     trans*= boneP.localTransform.toMat43().inverse()
-                     pIndex =  boneP.parentIndex
-                     
-                  if(pIndex == -1):    
-                     hasParent = False     
-                   
-                  if(hasParent):
-                      boneP = bones[pIndex] 
-                
-            #print(trans[0][3])
-            #print(trans[1][3])
-            #print(trans[2][3])
-            #print(trans[3][3])
             worldT = bone.WorldTransform.toMat43().inverse()
-            #lt =#+ trans
-            #worldT = NoeMat44.fromBytes(bone.localTBytes).toMat43().inverse()
-            noebones.append(NoeBone(bone.index,"bone_" + str(bone.index), worldT, None, bone.parentIndex))
+            noebones.append(NoeBone(bnIndx,"bone_" + str(bnIndx), worldT, "bone_" + str(bone.parentIndex), bone.parentIndex))
+            bnIndx+=1
+                   
         
         self.bones = bones 
         self.noeBones = noebones
@@ -985,7 +961,13 @@ class ModModelV230:
             v = 1.0 - bs.readFloat()
             UVBuffer.extend(bytearray(struct.pack("f", u)))
             UVBuffer.extend(bytearray(struct.pack("f", v)))
-            boneIndexBuffer.extend(bs.readBytes(2))
+            boneInd0 = bs.readByte()
+            boneInd1 = bs.readByte()
+            
+            boneIndR0 = self.boneMaps[mesh.BoneGroupIndex][boneInd0]
+            boneIndR1 = self.boneMaps[mesh.BoneGroupIndex][boneInd1]
+            boneIndexBuffer.extend(bytearray(struct.pack("b", boneInd0)))
+            boneIndexBuffer.extend(bytearray(struct.pack("b", boneInd1)))
             bw1 = bs.readByte() *0.00392156862
             bw2 = bs.readByte() *0.00392156862
             boneWeightBuffer.extend(bytearray(struct.pack("f", bw1)))
@@ -1022,8 +1004,7 @@ class ModModelV230:
             bw1 = bs.readByte() *0.00392156862#27
             bw2 = bs.readByte() *0.00392156862#28
             bs.seek(4, NOESEEK_REL)#32
-            boneIndexBuffer.extend(bs.readBytes(1))#33
-            boneIndexBuffer.extend(bs.readBytes(1))#34
+            boneIndexBuffer.extend(bs.readBytes(2))#33
             bw3 = bs.readByte() *0.00392156862#35
             bw4 = bs.readByte() *0.00392156862#36
             normalBuffer.extend(bytearray(struct.pack("f", nx)))
